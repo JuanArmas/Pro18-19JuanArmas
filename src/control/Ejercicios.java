@@ -50,14 +50,12 @@ public class Ejercicios {
 				}else if(golLocal < golVisitante) {
 					sumatoriaPuntosLocal = resultados.get(equipoLocal);
 					sumatoriaPuntosCasa = resultados.get(equipoVisitante) +3;
-				}else {
-					sumatoriaPuntosLocal = resultados.get(equipoLocal) +1;
-					sumatoriaPuntosCasa = resultados.get(equipoVisitante) +1;
-				}					
-				
+					}else {
+						sumatoriaPuntosLocal = resultados.get(equipoLocal) +1;
+						sumatoriaPuntosCasa = resultados.get(equipoVisitante) +1;
+				}									
 				resultados.put(equipoLocal, sumatoriaPuntosLocal);
-				resultados.put(equipoVisitante, sumatoriaPuntosCasa);
-				
+				resultados.put(equipoVisitante, sumatoriaPuntosCasa);				
 			}
 					
 			fichero.close();
@@ -83,8 +81,7 @@ public class Ejercicios {
 				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
 				String registro;			
 				while((registro= fichero.readLine()) != null) {
-					String[] arrayRegistro= registro.split("#");
-					
+					String[] arrayRegistro= registro.split("#");					
 					int idPartido = Integer.parseInt(arrayRegistro[0]);												
 					int jornada = Integer.parseInt(arrayRegistro[1]);												
 					String equipoLocal = arrayRegistro[2];												
@@ -94,11 +91,9 @@ public class Ejercicios {
 					
 					if (jornada == mostrarJornada) {
 						Partido unPartido = new Partido(idPartido, jornada, equipoLocal, golLocal, equipoVisitante, golVisitante);
-						resultadoJornadaEquipos.add(unPartido);
-						
+						resultadoJornadaEquipos.add(unPartido);						
 					}				
 				}
-									
 				fichero.close();
 				System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
 				
@@ -113,7 +108,12 @@ public class Ejercicios {
 			return resultadoJornadaEquipos;
 		}
 		/************************************fin metodos propios***********************************************/
-	
+												// 24 enero 2019
+		
+		
+		
+		
+		
 												// 23 enero 2019
 	
 	// cogiendo el fichero partidos, crear metodo para calcular los puntos de cada equipo (190partidos jugados)
