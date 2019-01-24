@@ -75,8 +75,7 @@ public class Ejercicios {
 	// crear metodo devolver partidos jugados en una jornada determinada
 	
 		public static ArrayList<Partido> devolverResultadoJornada(String rutaFichero, int mostrarJornada) {
-			ArrayList<Partido> resultadoJornadaEquipos = new ArrayList<Partido>();
-			
+			ArrayList<Partido> resultadoJornadaEquipos = new ArrayList<Partido>();			
 			try {
 				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
 				String registro;			
@@ -103,8 +102,7 @@ public class Ejercicios {
 				System.out.println("SALTO EXCEPCION: IO Exception... \n");
 			} catch (NumberFormatException e) {
 				System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
-			}
-			
+			}			
 			return resultadoJornadaEquipos;
 		}
 		/************************************fin metodos propios***********************************************/
@@ -911,10 +909,9 @@ public class Ejercicios {
 		// HashMap<String, Equipo> mapaEquipos = ejercicios.obtenciónMapaEquipos("ficheros/equipos.txt");	 
 		//ejercicios.mostrarNumeroPartidosJugados("ficheros/partidos.txt");
 		
-		HashMap<String, Integer> nuevoConteoPuntos = ejercicios.conteoPuntosPorEquipo("ficheros/partidos.txt");
-		/*ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 16);
-		
-		System.out.println("JORNADA: " + 16);
+		// HashMap<String, Integer> nuevoConteoPuntos = ejercicios.conteoPuntosPorEquipo("ficheros/partidos.txt");
+		/*ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 5);		
+		System.out.println("JORNADA: " + 5);
 		for (int i = 0; i < partidosJornada.size(); i++) {
 			//System.out.println(partidosJornada.get(i));			
 			System.out.println(partidosJornada.get(i).getIdPartido() +" - " + partidosJornada.get(i).getJornada() +" - " + partidosJornada.get(i).getNombreCortoEquipoLocal() +" - " + partidosJornada.get(i).getGolesLocal() +" - " + partidosJornada.get(i).getNombreCortoEquipoVisitante() +" - " + partidosJornada.get(i).getGolesVisitantes());
