@@ -54,6 +54,7 @@ public class Ejercicios {
 					sumatoriaPuntosLocal = resultados.get(equipoLocal) +1;
 					sumatoriaPuntosCasa = resultados.get(equipoVisitante) +1;
 				}					
+				
 				resultados.put(equipoLocal, sumatoriaPuntosLocal);
 				resultados.put(equipoVisitante, sumatoriaPuntosCasa);
 				
