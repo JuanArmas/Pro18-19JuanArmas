@@ -12,8 +12,11 @@ public class Estudiante extends Persona {
 		super();
 	}
 
-	public Estudiante(String nif, String nombre, int longitudPaso, LocalDate fecha_nac, char sexo) {
+	public Estudiante(String nif, String nombre, int longitudPaso, String fecha_nac, char sexo) {
 		super(nif, nombre, longitudPaso, fecha_nac, sexo);
+		this.curso = curso;
+		this.matricula = matricula;
+		this.turno = turno;
 		
 	}
 
@@ -41,4 +44,10 @@ public class Estudiante extends Persona {
 		this.turno = turno;
 	}
 
+	@Override
+	public String toString() {
+		return "Estudiante [curso=" + curso + ", matricula=" + matricula + ", turno=" + turno + "]";
+	}
+
+	
 }

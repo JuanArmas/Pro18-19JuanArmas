@@ -1,42 +1,388 @@
 package control;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
+import modelo.Equipo;
 import modelo.Estudiante;
+import modelo.Partido;
 import modelo.Persona;
 
 public class Ejercicios {
-
-	// 18 diciembre 18
+	
+	
+	
+	/****************************************metodos propios***********************************************/
+	
+	public static HashMap<String, Integer> conteoPuntosPorEquipo(String rutaFichero){		
+		HashMap<String, Integer> resultados = new  HashMap<String, Integer>();
+		try {
+			
+			BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+			String registro;			
+			while((registro= fichero.readLine()) != null) {
+				String[] arrayRegistro= registro.split("#");
+				String idPartido = arrayRegistro[0];												
+				String jornada = arrayRegistro[1];												
+				String equipoLocal = arrayRegistro[2];												
+				int golLocal = Integer.parseInt(arrayRegistro[3]);												
+				String equipoVisitante = arrayRegistro[4];												
+				int golVisitante = Integer.parseInt(arrayRegistro[5]);
+								
+				if(!resultados.containsKey(equipoLocal)){	//inicializar el hashmap para añadir el key
+					resultados.put(equipoLocal, 0);					
+				}
+				if(!resultados.containsKey(equipoVisitante)){	
+					resultados.put(equipoVisitante, 0);					
+				}
+				int sumatoriaPuntosLocal;
+				int sumatoriaPuntosCasa;
+				if(golLocal > golVisitante) {
+					sumatoriaPuntosLocal = resultados.get(equipoLocal) +3;
+					sumatoriaPuntosCasa = resultados.get(equipoVisitante);
+				}else if(golLocal < golVisitante) {
+					sumatoriaPuntosLocal = resultados.get(equipoLocal);
+					sumatoriaPuntosCasa = resultados.get(equipoVisitante) +3;
+				}else {
+					sumatoriaPuntosLocal = resultados.get(equipoLocal) +1;
+					sumatoriaPuntosCasa = resultados.get(equipoVisitante) +1;
+				}					
+				resultados.put(equipoLocal, sumatoriaPuntosLocal);
+				resultados.put(equipoVisitante, sumatoriaPuntosCasa);
+				
+			}
+					
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("SALTO EXCEPCION DE: FICHERO NO ENCONTRADO...");
+		} catch (IOException e) {
+			System.out.println("SALTO EXCEPCION DE: IO Exception...");
+		} catch (NumberFormatException e) {
+			System.out.println("SALTO EXCEPCION DE: FORMATO DE NUMERO INCORRECTO...");
+		}
+		
+		return resultados;		
+	}
+	
+	// crear metodo devolver partidos jugados en una jornada determinada
+	
+		public static ArrayList<Partido> devolverResultadoJornada(String rutaFichero, int mostrarJornada) {
+			ArrayList<Partido> resultadoJornadaEquipos = new ArrayList<Partido>();
+			
+			try {
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+				String registro;			
+				while((registro= fichero.readLine()) != null) {
+					String[] arrayRegistro= registro.split("#");
+					
+					int idPartido = Integer.parseInt(arrayRegistro[0]);												
+					int jornada = Integer.parseInt(arrayRegistro[1]);												
+					String equipoLocal = arrayRegistro[2];												
+					int golLocal = Integer.parseInt(arrayRegistro[3]);												
+					String equipoVisitante = arrayRegistro[4];												
+					int golVisitante = Integer.parseInt(arrayRegistro[5]);	
+					
+					if (jornada == mostrarJornada) {
+						Partido unPartido = new Partido(idPartido, jornada, equipoLocal, golLocal, equipoVisitante, golVisitante);
+						resultadoJornadaEquipos.add(unPartido);
+						
+					}				
+				}
+									
+				fichero.close();
+				System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+				
+			} catch (FileNotFoundException e) {
+				System.out.println("SALTO EXCEPCION: FICHERO NO ENCONTRADO... \n");
+			} catch (IOException e) {
+				System.out.println("SALTO EXCEPCION: IO Exception... \n");
+			} catch (NumberFormatException e) {
+				System.out.println("SALTO EXCEPCION: FORMATO DE NUMERO INCORRECTO... \n");
+			}
+			
+			return resultadoJornadaEquipos;
+		}
+		/************************************fin metodos propios***********************************************/
+	
+												// 23 enero 2019
+	
+	// cogiendo el fichero partidos, crear metodo para calcular los puntos de cada equipo (190partidos jugados)
+	// metodo detectar cuantos partidos se han jugado
+	// recorrer el fichero partidos.txt hasta que se encuentre el primer partido no jugado (el que no tiene numero en goles)
+	
+	public void mostrarNumeroPartidosJugados(String rutaFichero) {
+		try {
+			ArrayList<Equipo> listaEquipos = new  ArrayList<Equipo>();
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));				
+				String registro;
+				int cont = 0;
+				while((registro= fichero.readLine()) != null) { //plantilla para la lectura de todos los ficheros de txts
+					String[] unaLinea = registro.split("#");
+					
+					if (!unaLinea[3].equals("")) {	//el equals compara objetos y cadenas				
+					Integer.parseInt(unaLinea[3]);
+					cont++;
+					}else {
+						break;
+					}
+					System.out.println(cont);
+				}	
+						
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");		
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		} /*
+			catch (NumberFormatException e) {
+			System.out.println("FORMATO DE NUMERO INCORRECTO...");
+		}	*/
+	}
+	
+	
+	// coger el fichero equipos, crear una clase equipo
+	// crear arrayList de todos los equipos
+	public ArrayList<Equipo> obtenciónListaEquipos(String rutaFichero){
+		
+		try {
+			ArrayList<Equipo> listaEquipos = new  ArrayList<Equipo>();
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));				
+				String registro;
+				Equipo unEquipo;
+				while((registro= fichero.readLine()) != null) { //plantilla para la lectura de todos los ficheros de txts
+					String[] unaLinea = registro.split("#");
+					int idEquipo = Integer.parseInt(unaLinea[0]);
+					unEquipo = new Equipo(idEquipo, unaLinea[1], unaLinea[2]);	
+					listaEquipos.add(unEquipo);
+				}			
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+			return listaEquipos;
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");		
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}		
+		return null;		
+	}
+	
+	// la clave sera el nombre corto
+	public HashMap<String,Equipo> obtenciónMapaEquipos(String rutaFichero){
+		
+		try {
+			HashMap<String,Equipo> mapaEquipos = new  HashMap<String,Equipo>();
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));				
+				String registro;	
+				Equipo unEquipo;
+				while((registro= fichero.readLine()) != null) { //plantilla para la lectura de todos los ficheros de txts
+					// System.out.println(registro);
+					String[] unaLinea = registro.split("#");
+					int idEquipo = Integer.parseInt(unaLinea[0]);
+					unEquipo = new Equipo(idEquipo, unaLinea[1], unaLinea[2]);				
+					mapaEquipos.put(unaLinea[1], unEquipo);				
+			}
+			
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+			return mapaEquipos;
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");		
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}		
+		return null;
+	}
+	
+												// 22 enero 2019
+	
+	public HashMap<String, Integer> comprobarPartidos(String rutaFichero) {
+		
+		try {
+			HashMap<String, Integer> mapaEquipos = new HashMap<String, Integer>();
+			BufferedReader fichero;
+			fichero = new BufferedReader(new FileReader(rutaFichero));		
+			String registro;			
+			int cont =0;
+			while((registro= fichero.readLine()) != null) {
+				// System.out.println(registro);
+				String[] arrayRegistro = registro.split("#");
+				String nombreEquipoLocal = arrayRegistro[2];
+				String nombreEquipoVisitante = arrayRegistro[4];
+			
+				//.containsKey mira si la clave entre parentesis existe y esta operativa
+				if(!mapaEquipos.containsKey(nombreEquipoLocal)) { 
+					mapaEquipos.put(nombreEquipoLocal, 0);					
+				}
+				if(!mapaEquipos.containsKey(nombreEquipoVisitante)) { 
+					mapaEquipos.put(nombreEquipoVisitante, 0);					
+				}
+				int contador = (int)mapaEquipos.get(nombreEquipoLocal);
+				contador++;
+				mapaEquipos.replace(nombreEquipoLocal, contador); //reemplaza 
+				contador = (int)mapaEquipos.get(nombreEquipoVisitante);
+				contador++;
+				mapaEquipos.replace(nombreEquipoVisitante, contador);
+			}			
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+			return mapaEquipos;
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");		
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}
+			
+		return null;
+	}
+	
+	
+												// 18 diciembre 18
 
 	public void introListas() {
 
-		ArrayList<Persona> lista;
+		ArrayList<Persona> listaPersonas;
 
-		lista = new ArrayList<Persona>();
+		listaPersonas = new ArrayList<Persona>();
 		
-		lista.add(new Persona());
+		listaPersonas.add(new Persona());
 		
-		lista.add(new Persona("44321654F", "Pepe", 145, LocalDate.now(),'M'));
+		listaPersonas.add(new Persona("44321654F", "Pepe", 145, "14/01/1989",'M'));
 		
-		lista.add(1, new Persona("nuevoNif", "Pepe", 145, LocalDate.now(),'M'));
+		listaPersonas.add(1, new Persona("nuevoNif", "Pepe", 145, "15/12/2015",'M'));
 
+		for (Object elemento: listaPersonas) { //for abreviado. el tipo y donde se va a almacenar : donde va a iterar
+			System.out.println(elemento.toString());			
+		}
+		//ambos for hacen lo mismo, pero el de arriba es más efectivo por ser de poco código
+		for (int i = 0; i < listaPersonas.size(); i++) { 
+			System.out.println(listaPersonas.get(i));
+		}
 		
-		
-		System.out.println(lista.get(1).getNombre());
+		System.out.println(listaPersonas.get(1).getNombre());
 		
 		System.out.println("fin listas");
 	}
 
+	
+												// 09/01/2019 intoduccion a los maps
+	
+	public void introMapas() {
+		// declarar un mapa (HashMap) que almacena
+		// objetos de clase persona, la clave es el nif...
+		// inicializar el mapa
+		// insertar una serie de Estudiantes
+		
+		
+		Estudiante nuevoEstudiante2 = new Estudiante("2", "Juanita Rodriguez", 45, "14/01/1989", 'M');
+		nuevoEstudiante2.getNif();
+		
+		HashMap<String, Estudiante> mapaPersona = new HashMap<String, Estudiante>();
+		mapaPersona.put("1", new Estudiante());
+		Estudiante nuevoEstudiante = new Estudiante();
+		nuevoEstudiante.getNif();
+		mapaPersona.put(nuevoEstudiante.getNif(), nuevoEstudiante);
+		mapaPersona.put(nuevoEstudiante2.getNif(), nuevoEstudiante2);
+		
+		mapaPersona.put("4", new Estudiante("1", "Pepito Perez", 12, "24/041/1815", 'H'));
+		
+		//si no existe el nif inserta ese nif
+		if(!mapaPersona.containsKey(nuevoEstudiante.getNif())) { 
+			mapaPersona.put(nuevoEstudiante.getNif(), nuevoEstudiante);
+		}
+		
+		
+		// recorrer mapas
+		// 
+		
+		mapaPersona.get(nuevoEstudiante.getNif()).getNombre(); //forma para acceder al nombre
+		
+		// forma para acceder a los conjuntos () //devolvera un set (interfaz)
+		Set<String> clavesMapa = mapaPersona.keySet(); 
+		
+		//recorre clavesMapa y cada vez que se entre en un elemento habrá una clave de tipo string
+		for (String unaClave : clavesMapa) {  //habrá que entender estas lineas
+			System.out.println(mapaPersona.get(unaClave).getNombre());
+		}
+		
+		System.out.println("FIN DEL MAPA");
+		
+	}
+	
+	// 10/01/2019
+	
+	public void leerFichero(String rutaFichero) {
+		
+		try {
+			BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+			
+			String registro;
+			
+			while((registro= fichero.readLine()) != null) { //plantilla para la lectura de todos los ficheros de txts
+				System.out.println(registro);
+			}
+			
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");		
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}
+		
+	}
+	
+	// 15/01/2019 //verificar ejercicio, no devuelve lo que debiera.
+	
+	public ArrayList<Persona> generarListaPersonaDesdeFichero(String rutaFichero, String separador){
+		ArrayList<Persona> ArrayListaPersona = new ArrayList<Persona>();
+		try {
+			BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));	
+			
+			String unFichero;
+			while((unFichero = fichero.readLine()) != null) {
+				//la variable "separador" será definida cuando toque diciendole cual será
+				String[] campos = unFichero.split(separador); 			
+				
+				for (int i = 0; i < campos.length; i++) {
+					System.out.print(campos[i] + ", ");	
+				}
+				System.out.println("");
+				
+				int cantPasos = Integer.parseInt(campos[2]);
+				//crear objeto de la clase persona
+				Persona unaPersona = new Persona(campos[0], campos[1], cantPasos, campos[3], campos[4].charAt(0));
+				ArrayListaPersona.add(unaPersona);
+			}
+			
+		fichero.close();
+		return ArrayListaPersona;
+		} catch (FileNotFoundException e) {
+			System.out.println("Entrada al primer catch");
+		} catch (IOException e) {
+			System.out.println("Entrada al segundo catch");
+		}	
+	
+		return null;	
+	}
+	
 	// 13 dic 2018 Intro a la Herencia
 
 	// crear un Estudiante
 
 	public void crearEstudiante() {
 
-		Estudiante estudiante = new Estudiante("43781230V", "Pedro Garcia", 153, LocalDate.now(), 'M');
+		Estudiante estudiante = new Estudiante("43781230V", "Pedro Garcia", 153, "12/12/1212", 'M');
 
 	}
 
@@ -553,7 +899,25 @@ public class Ejercicios {
 
 		Ejercicios ejercicios = new Ejercicios();
 		
-		ejercicios.introListas();
+				
+		// ejercicios.introListas();
+		// ejercicios.introMapas();
+		// ejercicios.leerFichero("ficheros/datos.txt");
+		// ArrayList<Persona> listaPersona = ejercicios.generarListaPersonaDesdeFichero("ficheros/ficheroPersona.txt", "##");
+		// HashMap<String, Integer> numPartidosEquipo = ejercicios.comprobarPartidos("ficheros/partidos.txt");
+		// ArrayList<Equipo> listaEquipos = ejercicios.obtenciónListaEquipos("ficheros/equipos.txt");
+		// HashMap<String, Equipo> mapaEquipos = ejercicios.obtenciónMapaEquipos("ficheros/equipos.txt");	 
+		//ejercicios.mostrarNumeroPartidosJugados("ficheros/partidos.txt");
+		
+		HashMap<String, Integer> nuevoConteoPuntos = ejercicios.conteoPuntosPorEquipo("ficheros/partidos.txt");
+		/*ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 16);
+		
+		System.out.println("JORNADA: " + 16);
+		for (int i = 0; i < partidosJornada.size(); i++) {
+			//System.out.println(partidosJornada.get(i));			
+			System.out.println(partidosJornada.get(i).getIdPartido() +" - " + partidosJornada.get(i).getJornada() +" - " + partidosJornada.get(i).getNombreCortoEquipoLocal() +" - " + partidosJornada.get(i).getGolesLocal() +" - " + partidosJornada.get(i).getNombreCortoEquipoVisitante() +" - " + partidosJornada.get(i).getGolesVisitantes());
+		}*/
+		
 		System.exit(0);
 		
 		int[] lista1 = { 2, 4, 8, 9 };
