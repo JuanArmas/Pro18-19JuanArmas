@@ -62,11 +62,11 @@ public class Ejercicios {
 			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
 			
 		} catch (FileNotFoundException e) {
-			System.out.println("SALTO EXCEPCION DE: FICHERO NO ENCONTRADO...");
+			System.out.println("SALTO EXCEPCION DE: FileNotFoundException...");
 		} catch (IOException e) {
 			System.out.println("SALTO EXCEPCION DE: IO Exception...");
 		} catch (NumberFormatException e) {
-			System.out.println("SALTO EXCEPCION DE: FORMATO DE NUMERO INCORRECTO...");
+			System.out.println("SALTO EXCEPCION DE: NumberFormatException...");
 		}
 		
 		return resultados;		
@@ -98,16 +98,17 @@ public class Ejercicios {
 				System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
 				
 			} catch (FileNotFoundException e) {
-				System.out.println("SALTO EXCEPCION: FICHERO NO ENCONTRADO... \n");
+				System.out.println("SALTO EXCEPCION: FileNotFoundException... \n");
 			} catch (IOException e) {
 				System.out.println("SALTO EXCEPCION: IO Exception... \n");
 			} catch (NumberFormatException e) {
-				System.out.println("SALTO EXCEPCION: FORMATO DE NUMERO INCORRECTO... \n");
+				System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
 			}
 			
 			return resultadoJornadaEquipos;
 		}
 		/************************************fin metodos propios***********************************************/
+		
 												// 24 enero 2019
 		
 		
