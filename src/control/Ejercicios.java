@@ -71,6 +71,7 @@ public class Ejercicios {
 		
 		return resultados;		
 	}
+									/*******************************************/
 	
 	// crear metodo devolver partidos jugados en una jornada determinada
 	
@@ -105,6 +106,71 @@ public class Ejercicios {
 			}			
 			return resultadoJornadaEquipos;
 		}
+									/*******************************************/
+		
+		// metodo que devuelva victorias, empates y derrotas por cada equipo
+		// por cada equipo habrá una lista de contadores que representen VICTORIAS, EMPATES, DERROTAS
+		// 
+		public HashMap<String ,ArrayList<Integer>> resultadoLigaEquipos2(String rutaFichero){
+			HashMap<String ,ArrayList<Integer>> resultadoEquipo = new HashMap<String ,ArrayList<Integer>>();
+			ArrayList<Integer> resultados;
+			try {
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+				String registro;			
+				while((registro = fichero.readLine()) != null) {
+					String[] arrayRegistro = registro.split("#");					
+					int idPartido = Integer.parseInt(arrayRegistro[0]);												
+					int jornada = Integer.parseInt(arrayRegistro[1]);												
+					String equipoLocal = arrayRegistro[2];												
+					int golLocal = Integer.parseInt(arrayRegistro[3]);												
+					String equipoVisitante = arrayRegistro[4];												
+					int golVisitante = Integer.parseInt(arrayRegistro[5]);	
+					
+					if(!resultadoEquipo.containsKey(equipoLocal)){	//inicializar el hashmap para añadir el key
+						resultados = new ArrayList<Integer>();
+						resultados.add(0);
+						resultados.add(0);
+						resultados.add(0);
+						resultadoEquipo.put(equipoLocal, resultados);				
+					}
+					if(!resultadoEquipo.containsKey(equipoVisitante)){ //se crea el arrayList
+						resultados = new ArrayList<Integer>();
+						resultados.add(0);
+						resultados.add(0);
+						resultados.add(0);
+						resultadoEquipo.put(equipoVisitante, resultados);				
+					}			
+					
+					int indiceLocal = 0; // en el indice 0 del arrayList es donde se almacenan las victorias 
+					int indiceVisitante = 0; // en el indice 0 del arrayList es donde se almacenan las victorias 
+					
+						if (golLocal > golVisitante) {
+							indiceLocal = 0; //accede al indice de victoria del arrayList si gana el local
+							indiceVisitante = 2;
+						}else if (golLocal < golVisitante) {
+							indiceVisitante = 0;
+							indiceLocal = 2;
+						}else {
+							indiceVisitante = 1;
+							indiceLocal = 1;
+					}		
+						int incrementoLocal = resultadoEquipo.get(equipoLocal).get(indiceLocal)+1;
+						int incrementoVisitante = resultadoEquipo.get(equipoVisitante).get(indiceVisitante)+1;
+						resultadoEquipo.get(equipoLocal).set(indiceLocal,incrementoLocal);
+						resultadoEquipo.get(equipoVisitante).set(indiceVisitante,incrementoVisitante);
+				}
+				fichero.close();
+				System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");				
+			} catch (FileNotFoundException e) {
+				System.out.println("SALTO EXCEPCION: FileNotFoundException... \n");
+			} catch (IOException e) {
+				System.out.println("SALTO EXCEPCION: IO Exception... \n");
+			} catch (NumberFormatException e) {
+				System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
+			}			
+			return resultadoEquipo;
+		}
+		
 		/*************************************fin metodos propios***********************************************/
 		
 												// 24 enero 2019
