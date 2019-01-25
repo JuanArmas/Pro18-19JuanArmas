@@ -35,7 +35,7 @@ public class Ejercicios {
 				int golLocal = Integer.parseInt(arrayRegistro[3]);												
 				String equipoVisitante = arrayRegistro[4];												
 				int golVisitante = Integer.parseInt(arrayRegistro[5]);
-								
+				
 				if(!resultados.containsKey(equipoLocal)){	//inicializar el hashmap para añadir el key
 					resultados.put(equipoLocal, 0);					
 				}
@@ -105,13 +105,76 @@ public class Ejercicios {
 			}			
 			return resultadoJornadaEquipos;
 		}
-		/************************************fin metodos propios***********************************************/
+		/*************************************fin metodos propios***********************************************/
 		
 												// 24 enero 2019
 		
-		
-		
-		
+		// metodo que devuelva victorias, empates y derrotas por cada equipo
+		// por cada equipo habrá una lista de contadores que representen VICTORIAS, EMPATES, DERROTAS
+		// 
+		public HashMap<String ,ArrayList<Integer>> resultadoLigaEquipos(String rutaFichero){
+			HashMap<String ,ArrayList<Integer>> resultadoEquipo = new HashMap<String ,ArrayList<Integer>>();
+			ArrayList<Integer> resultados;
+			try {
+				BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+				String registro;			//1#1#GIR#0#RVA#0
+				while((registro = fichero.readLine()) != null) {
+					String[] arrayRegistro = registro.split("#");					
+					int idPartido = Integer.parseInt(arrayRegistro[0]);												
+					int jornada = Integer.parseInt(arrayRegistro[1]);												
+					String equipoLocal = arrayRegistro[2];												
+					int golLocal = Integer.parseInt(arrayRegistro[3]);												
+					String equipoVisitante = arrayRegistro[4];												
+					int golVisitante = Integer.parseInt(arrayRegistro[5]);	
+					
+					if(!resultadoEquipo.containsKey(equipoLocal)){	//inicializar el hashmap para añadir el key
+						resultados = new ArrayList<Integer>();
+						resultados.add(0);
+						resultados.add(0);
+						resultados.add(0);
+						resultadoEquipo.put(equipoLocal, resultados);				
+					}
+					if(!resultadoEquipo.containsKey(equipoVisitante)){ //se crea el arrayList
+						resultados = new ArrayList<Integer>();
+						resultados.add(0);
+						resultados.add(0);
+						resultados.add(0);
+						resultadoEquipo.put(equipoVisitante, resultados);				
+					}			
+					
+					int victoria = 0; // en el indice 0 del arrayList es donde se almacenan las victorias 
+					int empate = 0;	  // en el indice 1 del arrayList es donde se almacenan los empates
+					int derrota = 0;
+					
+						if (golLocal > golVisitante) {
+							victoria = resultadoEquipo.get(equipoLocal).get(0) + 1;
+							resultadoEquipo.get(equipoLocal).set(0, victoria);
+							derrota = resultadoEquipo.get(equipoVisitante).get(2) + 1;
+							resultadoEquipo.get(equipoVisitante).set(2, derrota);
+							
+						}else if (golLocal < golVisitante) {
+							victoria = resultadoEquipo.get(equipoVisitante).get(0) + 1;
+							resultadoEquipo.get(equipoVisitante).set(0, victoria);
+							derrota = resultadoEquipo.get(equipoLocal).get(2) + 1;
+							resultadoEquipo.get(equipoLocal).set(2, derrota);
+						}else {
+							empate = resultadoEquipo.get(equipoLocal).get(1) + 1;
+							resultadoEquipo.get(equipoLocal).set(1, empate);
+							empate = resultadoEquipo.get(equipoVisitante).get(1) + 1;
+							resultadoEquipo.get(equipoVisitante).set(1, empate);
+					}														
+				}
+				fichero.close();
+				System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");				
+			} catch (FileNotFoundException e) {
+				System.out.println("SALTO EXCEPCION: FileNotFoundException... \n");
+			} catch (IOException e) {
+				System.out.println("SALTO EXCEPCION: IO Exception... \n");
+			} catch (NumberFormatException e) {
+				System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
+			}			
+			return resultadoEquipo;
+		}
 		
 												// 23 enero 2019
 	
@@ -909,13 +972,21 @@ public class Ejercicios {
 		// HashMap<String, Equipo> mapaEquipos = ejercicios.obtenciónMapaEquipos("ficheros/equipos.txt");	 
 		//ejercicios.mostrarNumeroPartidosJugados("ficheros/partidos.txt");
 		
+		HashMap<String, ArrayList<Integer>> resultadoEquipos = ejercicios.resultadoLigaEquipos("ficheros/partidos.txt");
+		
+		
+		/*****************************************metodos propios***********************************************/
+		
 		// HashMap<String, Integer> nuevoConteoPuntos = ejercicios.conteoPuntosPorEquipo("ficheros/partidos.txt");
-		/*ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 5);		
+		/*
+		ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 5);		
 		System.out.println("JORNADA: " + 5);
 		for (int i = 0; i < partidosJornada.size(); i++) {
 			//System.out.println(partidosJornada.get(i));			
 			System.out.println(partidosJornada.get(i).getIdPartido() +" - " + partidosJornada.get(i).getJornada() +" - " + partidosJornada.get(i).getNombreCortoEquipoLocal() +" - " + partidosJornada.get(i).getGolesLocal() +" - " + partidosJornada.get(i).getNombreCortoEquipoVisitante() +" - " + partidosJornada.get(i).getGolesVisitantes());
 		}*/
+		
+		/**************************************fin metodos propios***********************************************/
 		
 		System.exit(0);
 		
