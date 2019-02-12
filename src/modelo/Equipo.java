@@ -1,6 +1,7 @@
 package modelo;
 
-public class Equipo {
+public class Equipo implements Comparable<Equipo> {
+	
 	
 	private int idEquipo;
 	private String nombreCortoEquipo;
@@ -36,12 +37,30 @@ public class Equipo {
 		this.nombreLargoEquipo = nombreLargoEquipo;
 	}
 	
-	@Override
+	/*@Override
 	public String toString() {
 		return "Equipo [idEquipo=" + idEquipo + ", nombreCortoEquipo=" + nombreCortoEquipo + ", nombreLargoEquipo="
 				+ nombreLargoEquipo + "]";
+	}*/
+	
+	@Override
+	public String toString() {
+		return idEquipo +" -> " + nombreCortoEquipo+" -> " + nombreLargoEquipo;
+		
 	}
-	
-	
+
+	@Override
+	public int compareTo(Equipo o) {
+		if(this.getIdEquipo() > this.getIdEquipo()) {		
+			return -1;
+			
+		} else if(this.getIdEquipo() < this.getIdEquipo()){ 
+			return 1;
+			
+			}
+		return 0;
+		
+	}
+
 	
 }
