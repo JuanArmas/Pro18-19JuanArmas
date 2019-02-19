@@ -2,19 +2,19 @@ package modelo;
 
 public class Partido {
 
-	private int idPartido;
-	private int jornada;
+	private Integer idPartido;
+	private Integer jornada;
 	private String nombreCortoEquipoLocal;
-	private int golesLocal;
+	private Integer golesLocal;
 	private String nombreCortoEquipoVisitante;
-	private int golesVisitantes;
+	private Integer golesVisitantes;
 	
 	public Partido() {
-		
+		super();
 	}
 
-	public Partido(int idPartido, int jornada, String nombreCortoEquipoLocal, int golesLocal, String nombreCortoEquipoVisitante,
-			int golesVisitantes) {
+	public Partido(Integer idPartido, Integer jornada, String nombreCortoEquipoLocal, Integer golesLocal, String nombreCortoEquipoVisitante,
+			Integer golesVisitantes) {
 		super();
 		this.idPartido = idPartido;
 		this.jornada = jornada;
@@ -25,22 +25,22 @@ public class Partido {
 	}
 
 	
-	public int getIdPartido() {
+	public Integer getIdPartido() {
 		return idPartido;
 	}
 
 
-	public void setIdPartido(int idPartido) {
+	public void setIdPartido(Integer idPartido) {
 		this.idPartido = idPartido;
 	}
 
 
-	public int getJornada() {
+	public Integer getJornada() {
 		return jornada;
 	}
 
 
-	public void setJornada(int jornada) {
+	public void setJornada(Integer jornada) {
 		this.jornada = jornada;
 	}
 
@@ -55,12 +55,12 @@ public class Partido {
 	}
 
 
-	public int getGolesLocal() {
+	public Integer getGolesLocal() {
 		return golesLocal;
 	}
 
 
-	public void setGolesLocal(int golesLocal) {
+	public void setGolesLocal(Integer golesLocal) {
 		this.golesLocal = golesLocal;
 	}
 
@@ -75,12 +75,12 @@ public class Partido {
 	}
 
 
-	public int getGolesVisitantes() {
+	public Integer getGolesVisitantes() {
 		return golesVisitantes;
 	}
 
 
-	public void setGolesVisitantes(int golesVisitantes) {
+	public void setGolesVisitantes(Integer golesVisitantes) {
 		this.golesVisitantes = golesVisitantes;
 	}
 

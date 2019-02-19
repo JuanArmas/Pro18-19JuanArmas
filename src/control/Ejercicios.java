@@ -26,10 +26,152 @@ import modelo.Partido;
 import modelo.Persona;
 
 public class Ejercicios {
-	
-	public ArrayList<Equipo> creaClasificacionEquipo(String rutaFicheroPartidos, HashMap<String, Equipo> nombreEquipos){
-		ArrayList<Equipo> listadoEquipos = new ArrayList<Equipo>();
+	// 14 febrero 2019 
+	// verificar el metodo en el github de mauricio, esto es para 
+	public Equipo buscarEquipoEnLista(String nombreCorto, ArrayList<Equipo> equipos) {
+		Equipo resultado = null;
 		
+		for (Equipo equipo : equipos) {
+			String nombreCortoEquipo = equipo.getNombreCortoEquipo();
+			if(nombreCortoEquipo.equals(nombreCorto)) {
+				return equipo;
+			}
+		}
+		System.out.println("Falló el método chaval");
+		return resultado;
+	}
+	
+	public void actualizaEquipos(Partido partido, ArrayList<Equipo> equipos){
+		String nCortoL = partido.getNombreCortoEquipoLocal();
+		String nCortoV = partido.getNombreCortoEquipoVisitante();
+		Integer gL = partido.getGolesLocal();
+		Integer gV = partido.getGolesVisitantes();
+		Equipo eL = buscarEquipoEnLista(nCortoL, equipos);
+		Equipo eV = buscarEquipoEnLista(nCortoV, equipos);
+		
+		if(gL > gV) {
+			eL.setVictorias(eL.getVictorias() + 1);
+			eL.setGolesFavor(eL.getGolesFavor() + gL);
+			eL.setGolesContra( eL.getGolesContra() + gV);
+			// poner conteo de puntos
+			eV.setDerrotas(eV.getDerrotas() + 1 );
+			eV.setGolesFavor(eV.getGolesFavor() + gV);
+			eV.setGolesContra( eV.getGolesContra() + gL);
+			
+		}else if (gL < gV) {
+			eV.setVictorias(eV.getVictorias() + 1);
+			eL.setGolesFavor(eL.getGolesFavor() + gL);
+			eL.setGolesContra( eL.getGolesContra() + gV);
+			// poner conteo de puntos
+			eL.setDerrotas(eL.getDerrotas() + 1 );
+			eV.setGolesFavor(eV.getGolesFavor() + gV);
+			eV.setGolesContra( eV.getGolesContra() + gL);
+			
+		}else {
+			eV.setEmpates(eV.getEmpates() + 1);
+			eL.setGolesFavor(eL.getGolesFavor() + gL);
+			eL.setGolesContra( eL.getGolesContra() + gV);
+			// poner conteo de puntos
+			eL.setEmpates(eL.getEmpates() + 1);
+			eV.setGolesFavor(eV.getGolesFavor() + gV);
+			eV.setGolesContra( eV.getGolesContra() + gL);
+			
+		}
+	}
+	
+	// 13 febrero 2019
+	// terminar el metodo actualizar equipo, dar una fila y devolver los datos
+	// dado un objeto partido actualizar los datos de esos equipos (de una lectura del fichero partidos) en la lista de equipo
+	// buscar los equipos secuencialmente (via hashmap¿?)
+	
+	/*Equipo calcularPuntos = new Equipo();
+	Integer puntos = calcularPuntos.calcularPuntos(); acceso a puntos de la clase,
+	se usara en otro metodo para modularizar la logica*/
+	
+	public void actualizaEquipos2(Partido partido, HashMap<String,Equipo> equipos){	
+								//1#1#GIR#0#RVA#0 		//1#RMA#REAL MADRID		
+		String eL = partido.getNombreCortoEquipoLocal();
+		Integer gL = partido.getGolesLocal();
+		String eV = partido.getNombreCortoEquipoVisitante();
+		Integer gV = partido.getGolesVisitantes();	
+			
+			if(gL > gV) {	
+				
+				equipos.get(eL).setVictorias(equipos.get(eL).getVictorias() + 1); 
+				equipos.get(eV).setDerrotas(equipos.get(eV).getDerrotas() + 1); 
+							
+			}else if(gL < gV) {
+				equipos.get(eV).setVictorias(equipos.get(eV).getVictorias() + 1); 
+				equipos.get(eL).setDerrotas(equipos.get(eL).getDerrotas() + 1); 
+				
+			}else {
+				equipos.get(eL).setEmpates(equipos.get(eL).getEmpates() + 1);
+				equipos.get(eV).setEmpates(equipos.get(eV).getEmpates() + 1);
+			}	
+	}		
+		
+	
+	public Partido creaPartido(String lineaFicheroPartido) {
+		Partido unPartido = new Partido();
+		String[] campos = lineaFicheroPartido.split("#");
+	
+		/*Partido unPartido = new Partido(null,null,eL,gL,eV,gV); otra forma de cargar el objeto en una linea*/
+		
+			Integer idPartido = Integer.parseInt(campos[0]);
+			Integer jornada = Integer.parseInt(campos[1]);
+			Integer gL = Integer.parseInt(campos[3]);		
+			Integer gV = Integer.parseInt(campos[5]);	
+			unPartido.setGolesLocal(gL);	
+			unPartido.setGolesVisitantes(gV);
+			unPartido.setIdPartido(idPartido);
+			unPartido.setJornada(jornada);
+			
+			try {
+				String	eL = campos[2];
+				String	eV = campos[4];
+				unPartido.setNombreCortoEquipoLocal(eL);
+				unPartido.setNombreCortoEquipoVisitante(eV);
+			} catch (NumberFormatException e) {
+			return null;
+			}
+			
+			
+
+		return unPartido;		
+	}
+	public ArrayList<Equipo> generaClasificacion(String rutaFicheroPartidos, String rutaFicheroEquipos){
+		ArrayList<Equipo> resultado = obtencionListaEquipos(rutaFicheroEquipos);
+		// HashMap<String, Equipo>  resultado = obtencionMapaEquipos(rutaFicheroEquipos);
+		try {
+			
+			BufferedReader fichero = new BufferedReader(new FileReader(rutaFicheroEquipos));
+			String registro;
+			Partido partido;
+			while ((registro = fichero.readLine()) != null) { 					
+				partido = creaPartido(registro);
+				// 1#1#GIR#0#RVA#0
+				if(partido == null) {
+					break;
+				}
+				// llamar metodo actualizaEquipos, previamente creado
+				// actualizaEquipos(partido, resultado);			
+			}
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");		
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}		
+	return resultado;
+	}
+
+	// 12 febrero 2019 - tarde
+
+	public ArrayList<Equipo> creaClasificacionEquipo(String rutaFicheroPartidos,
+			HashMap<String, Equipo> nombreEquipos) {
+		ArrayList<Equipo> listadoEquipos = new ArrayList<Equipo>();
+
 		HashMap<String, Equipo> hashMapEquipo = new HashMap<String, Equipo>();
 		try {
 			BufferedReader fichero = new BufferedReader(new FileReader(rutaFicheroPartidos));
@@ -39,29 +181,31 @@ public class Ejercicios {
 				if (arrayRegistro[3].equals("")) {
 					break;
 				}
-				
+
 				Integer idPartido = Integer.parseInt(arrayRegistro[0]);
 				Integer jornada = Integer.parseInt(arrayRegistro[1]);
 				String nombreCortoLocal = arrayRegistro[2];
 				Integer idEquipoLocal = nombreEquipos.get(nombreCortoLocal).getIdEquipo();
 				String nombreLargoEquipoLocal = nombreEquipos.get(nombreCortoLocal).getNombreLargoEquipo();
 				Integer golLocal = Integer.parseInt(arrayRegistro[3]);
-				
+
 				String nombreCortoVisitante = arrayRegistro[4];
 				Integer idEquipoVisitante = nombreEquipos.get(nombreCortoVisitante).getIdEquipo();
 				String nombreLargoEquipoVisitante = nombreEquipos.get(nombreCortoVisitante).getNombreLargoEquipo();
 				Integer golVisitante = Integer.parseInt(arrayRegistro[5]);
-					
+
 				if (!hashMapEquipo.containsKey(nombreCortoLocal)) { // inicializar el hashmap para añadir el key
-					Equipo unEquipo = new Equipo(idEquipoLocal, nombreCortoLocal, nombreLargoEquipoLocal,0,0,0,0,0,0);
+					Equipo unEquipo = new Equipo(idEquipoLocal, nombreCortoLocal, nombreLargoEquipoLocal, 0, 0, 0, 0,
+							0);
 					hashMapEquipo.put(nombreCortoLocal, unEquipo);
 				}
-				
+
 				if (!hashMapEquipo.containsKey(nombreCortoVisitante)) { // inicializar el hashmap para añadir el key
-					Equipo unEquipo = new Equipo(idEquipoVisitante, nombreCortoVisitante, nombreLargoEquipoVisitante,0,0,0,0,0,0);
+					Equipo unEquipo = new Equipo(idEquipoVisitante, nombreCortoVisitante, nombreLargoEquipoVisitante, 0,
+							0, 0, 0, 0);
 					hashMapEquipo.put(nombreCortoVisitante, unEquipo);
 				}
-				
+
 				Integer golesFavor = hashMapEquipo.get(nombreCortoLocal).getGolesFavor() + golLocal;
 				hashMapEquipo.get(nombreCortoLocal).setGolesFavor(golesFavor);
 				Integer golesContra = hashMapEquipo.get(nombreCortoLocal).getGolesContra() + golVisitante;
@@ -70,45 +214,35 @@ public class Ejercicios {
 				golesFavor = hashMapEquipo.get(nombreCortoVisitante).getGolesFavor() + golLocal;
 				hashMapEquipo.get(nombreCortoVisitante).setGolesFavor(golesFavor);
 				golesContra = hashMapEquipo.get(nombreCortoVisitante).getGolesContra() + golVisitante;
-				hashMapEquipo.get(nombreCortoVisitante).setGolesContra(golesContra); 
-				
+				hashMapEquipo.get(nombreCortoVisitante).setGolesContra(golesContra);
+
 				Integer victoria = 0; // en el indice 0 del arrayList es donde se almacenan las victorias
 				Integer empate = 0; // en el indice 1 del arrayList es donde se almacenan los empates
 				Integer derrota = 0;
-				Integer puntos = 0 ;
-				
+				Integer puntos = 0;
+
 				if (golLocal > golVisitante) {
 					victoria = hashMapEquipo.get(nombreCortoLocal).getVictorias() + 1;
 					hashMapEquipo.get(nombreCortoLocal).setVictorias(victoria);
 					derrota = hashMapEquipo.get(nombreCortoVisitante).getDerrotas() + 1;
 					hashMapEquipo.get(nombreCortoVisitante).setDerrotas(derrota);
-					puntos = hashMapEquipo.get(nombreCortoLocal).getPuntos() + 3;
-					hashMapEquipo.get(nombreCortoLocal).setPuntos(puntos);
-					
-					
-					
+
 				} else if (golLocal < golVisitante) {
 					victoria = hashMapEquipo.get(nombreCortoVisitante).getVictorias() + 1;
 					hashMapEquipo.get(nombreCortoVisitante).setVictorias(victoria);
 					derrota = hashMapEquipo.get(nombreCortoLocal).getDerrotas() + 1;
 					hashMapEquipo.get(nombreCortoLocal).setDerrotas(derrota);
-					puntos = hashMapEquipo.get(nombreCortoVisitante).getPuntos() +3;
-					hashMapEquipo.get(nombreCortoVisitante).setPuntos(puntos);
-					
-					
+
 				} else {
 					empate = hashMapEquipo.get(nombreCortoLocal).getEmpates() + 1;
 					hashMapEquipo.get(nombreCortoLocal).setEmpates(empate);
 					empate = hashMapEquipo.get(nombreCortoVisitante).getEmpates() + 1;
 					hashMapEquipo.get(nombreCortoVisitante).setEmpates(empate);
-					puntos = hashMapEquipo.get(nombreCortoLocal).getPuntos() + 1;
-					hashMapEquipo.get(nombreCortoLocal).setPuntos(puntos);
-					puntos = hashMapEquipo.get(nombreCortoVisitante).getPuntos() + 1;
-					hashMapEquipo.get(nombreCortoVisitante).setPuntos(puntos);
+
 				}
 				System.out.println();
 			}
-			
+
 			fichero.close();
 			System.out.println("Lectura Exitosa. Fin de la lectura del fichero. \n");
 		} catch (FileNotFoundException e) {
@@ -119,128 +253,106 @@ public class Ejercicios {
 			System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
 		}
 		listadoEquipos = convertirHashEquipo(hashMapEquipo);
-		// Collections.sort(listadoEquipos,(o2, o1) -> o1.getPuntos().compareTo(o2.getPuntos()));
-		
-		Collections.sort( listadoEquipos, new Comparator<Equipo>(){
-	        public int compare( Equipo o1, Equipo o2 ) {
-	            return (o2.getPuntos().compareTo( o1.getPuntos()));
-	        }
+		// Collections.sort(listadoEquipos,(o2, o1) ->
+		// o1.getPuntos().compareTo(o2.getPuntos()));
 
-        } );
-		
+		Collections.sort(listadoEquipos, new Comparator<Equipo>() {
+			public int compare(Equipo o1, Equipo o2) {
+				return (o2.calcularPuntos().compareTo(o1.calcularPuntos()));
+			}
+
+		});
+
 		System.out.println(listadoEquipos);
-		
+
 		return listadoEquipos;
 	}
-	
 
-	
-	public ArrayList<Equipo> convertirHashEquipo( HashMap<String, Equipo> hashMapEquipo){
+	public ArrayList<Equipo> convertirHashEquipo(HashMap<String, Equipo> hashMapEquipo) {
 		ArrayList<Equipo> arrayListEquipos = new ArrayList<Equipo>();
-		
+
 		Set<String> clavesMapaEquipos = hashMapEquipo.keySet();
-		for( String clave : clavesMapaEquipos) {
+		for (String clave : clavesMapaEquipos) {
 			Equipo unEquipo = hashMapEquipo.get(clave);
 			arrayListEquipos.add(unEquipo);
 		}
 		return arrayListEquipos;
 	}
-	
-	
-	
-	//12 febrero 2019
-	// ordenar el metodo creaClasificacion por puntos 
+
+	// 12 febrero 2019 - mañana
+	// ordenar el metodo creaClasificacion por puntos
 	// usar el jtable de swing para mostrarlo
-	
-	/*
-	public void ordenarMapaPuntosEquipos(HashMap<String,ArrayList<Integer>> puntosEquipos) {
-				
-		Set<Entry<String, ArrayList<Integer>>> set = puntosEquipos.entrySet();
-        List<Map.Entry<String, ArrayList<Integer>>> list = new ArrayList<Map.Entry<String, ArrayList<Integer>>>(set);
-        
-        //Expresion Lambda //curiosidad por ahora...
-        //Collections.sort(list,(o1, o2) -> o1.getValue().compareTo(o2.getValue())); 
-         Collections.sort( list, new Comparator<Map.Entry<String, ArrayList<Integer>>>()
-        {
-	        public int compare( Map.Entry<String, ArrayList<Integer>> o1, Map.Entry<String, ArrayList<Integer>> o2 )
-	        {
-	            return (o2.getValue().get(3)).compareTo( o1.getValue().get(3));
-	        }
-        } );
-        
-        for(Map.Entry<String, ArrayList<Integer>> entry:list){
-        	System.out.println(entry.getKey() +" ==== "+ entry.getValue());
-        						
-        }
-	}
-	 * */
-	
+
 	// 07 febrero 2019
-	
+
 	// devolver el nombre largo del equipo seguido de todos sus valores.
-	// sacar el nombre largo de los equipos de una coleccion dada (acceder al metodo obtencionListaEquipo)
-	// hashmap clave (nomLargoEquipo) valor (resto de datos, puntos, Victorias.Empates.Derrotas, golesAfavor, golesContra.)
+	// sacar el nombre largo de los equipos de una coleccion dada (acceder al metodo
+	// obtencionListaEquipo)
+	// hashmap clave (nomLargoEquipo) valor (resto de datos, puntos,
+	// Victorias.Empates.Derrotas, golesAfavor, golesContra.)
 	// acumuladore goles a favor goles en contra.
 	// HM<String,AL<Integer>> devolverlo.
-	// obtener datos para la clasificacion.  
-	
-	public HashMap<String,ArrayList<Integer>> creaClasificacion(String rutaFicheroPartidos, String rutaFicheroEquipos){
-		HashMap<String,ArrayList<Integer>> clasificacion = new HashMap<String,ArrayList<Integer>>();
+	// obtener datos para la clasificacion.
+
+	public HashMap<String, ArrayList<Integer>> creaClasificacion(String rutaFicheroPartidos,
+			String rutaFicheroEquipos) {
+		HashMap<String, ArrayList<Integer>> clasificacion = new HashMap<String, ArrayList<Integer>>();
 		HashMap<String, Equipo> nombreEquipos = this.obtencionMapaEquipos(rutaFicheroEquipos);
 		HashMap<String, ArrayList<Integer>> vicDerrEmpEquipos = this.resultadoLigaEquipos(rutaFicheroPartidos);
 		HashMap<String, Integer> puntosEquipos = this.generaPuntosEquipos(vicDerrEmpEquipos);
 		HashMap<String, ArrayList<Integer>> golesFavorContraEquipos = this.sumarGolesEquipos(rutaFicheroPartidos);
-	
+
 		Set<String> conjuntoClavesNombreCorto = nombreEquipos.keySet();
-		for( String claveEquipo : conjuntoClavesNombreCorto) {
+		for (String claveEquipo : conjuntoClavesNombreCorto) {
 			Equipo unEquipo = nombreEquipos.get(claveEquipo);
 			String nombreLargoUnEquipo = unEquipo.getNombreLargoEquipo();
-			// cada celda ira por este orden -> puntos, victorias, empates, derrotas, golesFavor, golesContra.
-			
-			ArrayList<Integer> listadoClasificacion = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0, 0, 0)); 
+			// cada celda ira por este orden -> puntos, victorias, empates, derrotas,
+			// golesFavor, golesContra.
+
+			ArrayList<Integer> listadoClasificacion = new ArrayList<Integer>(Arrays.asList(0, 0, 0, 0, 0, 0));
 			clasificacion.put(nombreLargoUnEquipo, listadoClasificacion);
-		
-			Set<Entry<String, Equipo>> conjuntoClavesNombreEquipos = nombreEquipos.entrySet();		
-			for(  Entry<String, Equipo> claveNombresEquipo : conjuntoClavesNombreEquipos) {
-							
+
+			Set<Entry<String, Equipo>> conjuntoClavesNombreEquipos = nombreEquipos.entrySet();
+			for (Entry<String, Equipo> claveNombresEquipo : conjuntoClavesNombreEquipos) {
+
 				String clave = claveNombresEquipo.getKey();
 				String valor = claveNombresEquipo.getValue().getNombreLargoEquipo();
-				
-					if(nombreLargoUnEquipo.equals(valor)) {
-						Integer puntosUnEquipo = puntosEquipos.get(clave);
-						listadoClasificacion.set(0, puntosUnEquipo);
-						Integer victorias = vicDerrEmpEquipos.get(clave).get(0);
-						Integer empates = vicDerrEmpEquipos.get(clave).get(1);
-						Integer derrotas = vicDerrEmpEquipos.get(clave).get(2);
-						listadoClasificacion.set(1, victorias);
-						listadoClasificacion.set(2, empates);
-						listadoClasificacion.set(3, derrotas);
-						Integer golesFavor = golesFavorContraEquipos.get(clave).get(0);
-						Integer golesContra = golesFavorContraEquipos.get(clave).get(1);
-						listadoClasificacion.set(4, golesFavor);
-						listadoClasificacion.set(5, golesContra);
-					}
+
+				if (nombreLargoUnEquipo.equals(valor)) {
+					Integer puntosUnEquipo = puntosEquipos.get(clave);
+					listadoClasificacion.set(0, puntosUnEquipo);
+					Integer victorias = vicDerrEmpEquipos.get(clave).get(0);
+					Integer empates = vicDerrEmpEquipos.get(clave).get(1);
+					Integer derrotas = vicDerrEmpEquipos.get(clave).get(2);
+					listadoClasificacion.set(1, victorias);
+					listadoClasificacion.set(2, empates);
+					listadoClasificacion.set(3, derrotas);
+					Integer golesFavor = golesFavorContraEquipos.get(clave).get(0);
+					Integer golesContra = golesFavorContraEquipos.get(clave).get(1);
+					listadoClasificacion.set(4, golesFavor);
+					listadoClasificacion.set(5, golesContra);
+				}
 			}
 		}
 		System.out.println(clasificacion);
 		return clasificacion;
 	}
-	
+
 	public HashMap<String, ArrayList<Integer>> sumarGolesEquipos(String rutaFichero) {
-		HashMap<String, ArrayList<Integer>> golesEquipos = new HashMap<String, ArrayList<Integer>>();		
+		HashMap<String, ArrayList<Integer>> golesEquipos = new HashMap<String, ArrayList<Integer>>();
 		ArrayList<Integer> golesFavorContra;
-		
+
 		try {
 			BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
 			String registro; // 1#1#GIR#0#RVA#0
 			while ((registro = fichero.readLine()) != null) {
 				String[] arrayRegistro = registro.split("#");
-				
+
 				if (arrayRegistro[3].equals("")) {
 					break;
 				}
-				//int idPartido = Integer.parseInt(arrayRegistro[0]);
-				//int jornada = Integer.parseInt(arrayRegistro[1]);
+				// int idPartido = Integer.parseInt(arrayRegistro[0]);
+				// int jornada = Integer.parseInt(arrayRegistro[1]);
 				String equipoLocal = arrayRegistro[2];
 				Integer golLocal = Integer.parseInt(arrayRegistro[3]);
 				String equipoVisitante = arrayRegistro[4];
@@ -258,23 +370,23 @@ public class Ejercicios {
 				}
 
 				ArrayList<Integer> golesEquipoLocal = golesEquipos.get(equipoLocal);
-				
+
 				Integer golesAFavorEquipoLocal = golesEquipoLocal.get(0);
 				Integer sumatoriaGolesAFavorEquipoLocal = golesAFavorEquipoLocal + golLocal;
-				Integer golesEnContraEquipoLocal = golesEquipoLocal.get(1);	
+				Integer golesEnContraEquipoLocal = golesEquipoLocal.get(1);
 				Integer sumatoriaGolesEnContraEquipoLocal = golesEnContraEquipoLocal + golVisitante;
 				golesEquipoLocal.set(0, sumatoriaGolesAFavorEquipoLocal);
 				golesEquipoLocal.set(1, sumatoriaGolesEnContraEquipoLocal);
-				
+
 				ArrayList<Integer> golesEquipoVisitante = golesEquipos.get(equipoVisitante);
-				
+
 				Integer golesAFavorEquipoVisitante = golesEquipoVisitante.get(0);
 				Integer sumatoriaGolesAFavorEquipoVisitante = golesAFavorEquipoVisitante + golVisitante;
 				Integer golesEnContraEquipoVisistante = golesEquipoVisitante.get(1);
 				Integer sumatoriaGolesEnContraEquipoVisitante = golesEnContraEquipoVisistante + golLocal;
 				golesEquipoVisitante.set(0, sumatoriaGolesAFavorEquipoVisitante);
 				golesEquipoVisitante.set(1, sumatoriaGolesEnContraEquipoVisitante);
-				
+
 			}
 			fichero.close();
 			System.out.println("Lectura Exitosa. Fin de la lectura del fichero. \n");
@@ -287,183 +399,159 @@ public class Ejercicios {
 		}
 		return golesEquipos;
 	}
-	
-	
-	
-	
-	//06 febrero 2019
+
+	// 06 febrero 2019
 	// ejercicio propuesto:
-	// obtener listado ordenado nombres largos equipos y a la derecha los partidos jugados
+	// obtener listado ordenado nombres largos equipos y a la derecha los partidos
+	// jugados
 	// a partir del metodo obtenciónListaEquipos;
-	
+
 	public ArrayList<Equipo> equiposListaOrdenadaNombre() {
 		ArrayList<Equipo> lista = obtencionListaEquipos("ficheros/equipos.txt");
-		
-	
+
 		/*
-		 //ordenar por nombreLargo
-		
-		 lista.sort(new Comparator<Equipo>() {
-			@Override
-			public int compare(Equipo equi1, Equipo equi2) {
-				
-				return (equi2.getNombreLargoEquipo().compareTo(equi1.getNombreLargoEquipo()));
-			}	
-		});
-		*/
-		
-		
-		/*
-		// ordenar por idEquipo comparando primitivo int
-		 lista.sort(new Comparator<Equipo>() {
-			@Override
-			public int compare(Equipo equi1, Equipo equi2) {
-				
-				if(equi1.getIdEquipo() > equi2.getIdEquipo()) {
-					return -1;					
-				} else if(equi1.getIdEquipo() < equi2.getIdEquipo()){ 
-					return 1;
-					}else
-					 	return 0;
-			}	
-		});
-		*/
-		/*
-		// ordenar por idEquipo comparando objetos Integer
-		 lista.sort(new Comparator<Equipo>() {
-				@Override
-				public int compare(Equipo equi1, Equipo equi2) {
-					
-					return (((Integer)equi1.getIdEquipo()).compareTo(((Integer)equi2.getIdEquipo())));
-				}	
-			});
+		 * //ordenar por nombreLargo
+		 * 
+		 * lista.sort(new Comparator<Equipo>() {
+		 * 
+		 * @Override public int compare(Equipo equi1, Equipo equi2) {
+		 * 
+		 * return
+		 * (equi2.getNombreLargoEquipo().compareTo(equi1.getNombreLargoEquipo())); } });
 		 */
-		 lista.sort(null); 
-		 
+
+		/*
+		 * // ordenar por idEquipo comparando primitivo int lista.sort(new
+		 * Comparator<Equipo>() {
+		 * 
+		 * @Override public int compare(Equipo equi1, Equipo equi2) {
+		 * 
+		 * if(equi1.getIdEquipo() > equi2.getIdEquipo()) { return -1; } else
+		 * if(equi1.getIdEquipo() < equi2.getIdEquipo()){ return 1; }else return 0; }
+		 * });
+		 */
+		/*
+		 * // ordenar por idEquipo comparando objetos Integer lista.sort(new
+		 * Comparator<Equipo>() {
+		 * 
+		 * @Override public int compare(Equipo equi1, Equipo equi2) {
+		 * 
+		 * return
+		 * (((Integer)equi1.getIdEquipo()).compareTo(((Integer)equi2.getIdEquipo()))); }
+		 * });
+		 */
+		lista.sort(null);
+
 		return lista;
-		
+
 	}
-	
-	
-	//hacer la ordenacion por goles a favor y goles en contra tambien
-	
-	//intentar generar un nuevo objeto ordenado sin perder el que nos dan desordenado  ¿?
-	public void ordenarMapaPuntosEquipos(HashMap<String,ArrayList<Integer>> puntosEquipos) {
-				
+
+	// hacer la ordenacion por goles a favor y goles en contra tambien
+
+	// intentar generar un nuevo objeto ordenado sin perder el que nos dan
+	// desordenado ¿?
+	public void ordenarMapaPuntosEquipos(HashMap<String, ArrayList<Integer>> puntosEquipos) {
+
 		Set<Entry<String, ArrayList<Integer>>> set = puntosEquipos.entrySet();
-        List<Map.Entry<String, ArrayList<Integer>>> list = new ArrayList<Map.Entry<String, ArrayList<Integer>>>(set);
-        
-        //Expresion Lambda //curiosidad por ahora...
-        //Collections.sort(list,(o1, o2) -> o1.getValue().compareTo(o2.getValue())); 
-        
-        
-        Collections.sort( list, new Comparator<Map.Entry<String, ArrayList<Integer>>>(){
-	        public int compare( Map.Entry<String, ArrayList<Integer>> o1, Map.Entry<String, ArrayList<Integer>> o2 )
-	        {
-	            return (o2.getValue().get(3)).compareTo( o1.getValue().get(3));
-	        }
-        } );
-        
-        for(Map.Entry<String, ArrayList<Integer>> entry:list){
-        	System.out.println(entry.getKey()+" ==== "+entry.getValue());
-        }
+		List<Map.Entry<String, ArrayList<Integer>>> list = new ArrayList<Map.Entry<String, ArrayList<Integer>>>(set);
+
+		// Expresion Lambda //curiosidad por ahora...
+		// Collections.sort(list,(o1, o2) -> o1.getValue().compareTo(o2.getValue()));
+
+		Collections.sort(list, new Comparator<Map.Entry<String, ArrayList<Integer>>>() {
+			public int compare(Map.Entry<String, ArrayList<Integer>> o1, Map.Entry<String, ArrayList<Integer>> o2) {
+				return (o2.getValue().get(3)).compareTo(o1.getValue().get(3));
+			}
+		});
+
+		for (Map.Entry<String, ArrayList<Integer>> entry : list) {
+			System.out.println(entry.getKey() + " ==== " + entry.getValue());
+		}
 	}
-	
-	
-	
-	public HashMap<String, Integer> generaPuntosEquipos(HashMap<String, ArrayList<Integer>> partidos_GEP){
-		HashMap<String, Integer> mapaPuntos= new HashMap<String, Integer>();
-		
-		for (String clave : partidos_GEP.keySet()) { //recorrer el mapa por key
+
+	public HashMap<String, Integer> generaPuntosEquipos(HashMap<String, ArrayList<Integer>> partidos_GEP) {
+		HashMap<String, Integer> mapaPuntos = new HashMap<String, Integer>();
+
+		for (String clave : partidos_GEP.keySet()) { // recorrer el mapa por key
 			ArrayList<Integer> datos = partidos_GEP.get(clave);
-			Integer puntos = datos.get(0) * 3 + datos.get(1);	
+			Integer puntos = datos.get(0) * 3 + datos.get(1);
 			mapaPuntos.put(clave, puntos);
-		}	
+		}
 		return mapaPuntos;
 	}
-	
-	
+
 	// 31 enero 2019
 	// ordenar HashMap por valor
 	// por medio de la interfaz java.lang.comparable ---> compareTo
-	
+
 	public void muestraPuntosOrdenadosEquipos(HashMap<String, ArrayList<Integer>> resultados) {
-		//recorrer el hashmap previamente ordenado por puntos
-		HashMap<String, Integer>mapaOrdenadoPuntos = new HashMap<String, Integer>();
-		//obrtenemos la lista de claves
-		for (String clave : resultados.keySet()) { //recorrer el mapa por key
+		// recorrer el hashmap previamente ordenado por puntos
+		HashMap<String, Integer> mapaOrdenadoPuntos = new HashMap<String, Integer>();
+		// obrtenemos la lista de claves
+		for (String clave : resultados.keySet()) { // recorrer el mapa por key
 			ArrayList<Integer> datos = resultados.get(clave);
 			int puntos = datos.get(0) * 3 + datos.get(1);
-			// se alimenta el hashmap 
+			// se alimenta el hashmap
 			mapaOrdenadoPuntos.put(clave, puntos);
 		}
-		//ahora se ordena
-		
+		// ahora se ordena
+
 		ArrayList<Integer> valoresPuntos = new ArrayList<Integer>(mapaOrdenadoPuntos.values());
-		Collections.sort(valoresPuntos); //ordena listas
-		
-		
+		Collections.sort(valoresPuntos); // ordena listas
+
 	}
-	
-	
-	
+
 	// 30 enero 2019
 	// ejemplo app de escritorio, pruebal SWING (MVC)
 	public void pruebaSWING() {
-		JFrame ventana =new JFrame("Mi Primer SWING"); //JFrame clase de javax.swing donde se almacenan las librerias¿?
+		JFrame ventana = new JFrame("Mi Primer SWING"); // JFrame clase de javax.swing donde se almacenan las
+														// librerias¿?
 		JButton boton = new JButton("Dame caña nino!"); // crear boton
 		JPanel panel = new JPanel(); // crear panel, ventana
-		ventana.add(panel);	
-		/*ArrayList<Equipo> equipos = this.obtencionListaEquipos("ficheros/equipos.txt");
-		Equipo[] arrayEquipos = equipos.toArray(new Equipo[equipos.size()]);
-		JComboBox lista = new JComboBox(arrayEquipos); // 
-		panel.add(lista);
-		panel.add(boton);
-		boton.addActionListener(new ActionListener() { // evento para el botón al pulsar
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(lista.getSelectedItem()); //imprime el dato seleccionado al pulsar el boton
-				
-			}
-		});*/
-		
-		String[] nombreEquipos = {
-				"Nombre Equipo",
-				"Puntos",
-				"Victorias",
-				"Empates",
-				"Derrotas",
-				"Goles a favor",
-				"Goles en Contra"
-		};
-		
-		HashMap<String, ArrayList<Integer>> datosClasificacion = creaClasificacion("ficheros/partidos.txt", "ficheros/equipos.txt");
-		
+		ventana.add(panel);
+		/*
+		 * ArrayList<Equipo> equipos =
+		 * this.obtencionListaEquipos("ficheros/equipos.txt"); Equipo[] arrayEquipos =
+		 * equipos.toArray(new Equipo[equipos.size()]); JComboBox lista = new
+		 * JComboBox(arrayEquipos); // panel.add(lista); panel.add(boton);
+		 * boton.addActionListener(new ActionListener() { // evento para el botón al
+		 * pulsar
+		 * 
+		 * @Override public void actionPerformed(ActionEvent e) {
+		 * System.out.println(lista.getSelectedItem()); //imprime el dato seleccionado
+		 * al pulsar el boton
+		 * 
+		 * } });
+		 */
+
+		String[] nombreEquipos = { "Nombre Equipo", "Puntos", "Victorias", "Empates", "Derrotas", "Goles a favor",
+				"Goles en Contra" };
+
+		HashMap<String, ArrayList<Integer>> datosClasificacion = creaClasificacion("ficheros/partidos.txt",
+				"ficheros/equipos.txt");
+
 		JTable tablaClasificacion;
-		//= new JTable(datosClasificacion,nombreEquipos);
-		
-		Vector<ArrayList<Integer>>unVector = new Vector<>();
-		//alimentar el vector con los datos del arraylist con el for
-		
-		//tablaClasificacion = new JTable
-		ventana.pack(); // 
-		ventana.setVisible(true); //  
+		// = new JTable(datosClasificacion,nombreEquipos);
+
+		Vector<ArrayList<Integer>> unVector = new Vector<>();
+		// alimentar el vector con los datos del arraylist con el for
+
+		// tablaClasificacion = new JTable
+		ventana.pack(); //
+		ventana.setVisible(true); //
 	}
-	
-	
+
 	// 29 enero 2019
-	
+
 	public void muestraPuntosEquipos(HashMap<String, ArrayList<Integer>> resultados) {
-		for (String clave : resultados.keySet()) { //recorrer el mapa por key
+		for (String clave : resultados.keySet()) { // recorrer el mapa por key
 			ArrayList<Integer> datos = resultados.get(clave);
 			int puntos = datos.get(0) * 3 + datos.get(1);
 			System.out.println(clave + " => " + puntos);
 			Collections.sort(datos);
 		}
 	}
-	
-	
+
 	// 24 enero 2019
 
 	// metodo que devuelva victorias, empates y derrotas por cada equipo
@@ -569,7 +657,10 @@ public class Ejercicios {
 			 * System.out.println("FORMATO DE NUMERO INCORRECTO..."); }
 			 */
 	}
-	/***************************************** metodos propios ***********************************************/
+
+	/*****************************************
+	 * metodos propios
+	 ***********************************************/
 
 	public static HashMap<String, Integer> conteoPuntosPorEquipo(String rutaFichero) {
 		HashMap<String, Integer> resultados = new HashMap<String, Integer>();
@@ -595,7 +686,7 @@ public class Ejercicios {
 				if (!resultados.containsKey(equipoVisitante)) {
 					resultados.put(equipoVisitante, 0);
 				}
-				
+
 				int sumatoriaPuntosLocal;
 				int sumatoriaPuntosVisitante;
 				if (golLocal > golVisitante) {
@@ -735,7 +826,9 @@ public class Ejercicios {
 		return resultadoEquipo;
 	}
 
-	/************************************** fin metodos propios ***********************************************/
+	/**************************************
+	 * fin metodos propios
+	 ***********************************************/
 	// coger el fichero equipos, crear una clase equipo
 	// crear arrayList de todos los equipos
 	public ArrayList<Equipo> obtencionListaEquipos(String rutaFichero) {
@@ -747,7 +840,7 @@ public class Ejercicios {
 			Equipo unEquipo;
 			while ((registro = fichero.readLine()) != null) { // plantilla para la lectura de todos los ficheros de txts
 				String[] unaLinea = registro.split("#");
-				
+
 				String nombCortoEquipo = unaLinea[1];
 				String nombrLargoEquipo = unaLinea[2];
 				Integer idEquipo = Integer.parseInt(unaLinea[0]);
@@ -776,7 +869,7 @@ public class Ejercicios {
 			while ((registro = fichero.readLine()) != null) { // plantilla para la lectura de todos los ficheros de txts
 				// System.out.println(registro);
 				String[] unaLinea = registro.split("#");
-				
+
 				String nombCortoEquipo = unaLinea[1];
 				String nombrLargoEquipo = unaLinea[2];
 				int idEquipo = Integer.parseInt(unaLinea[0]);
@@ -1484,7 +1577,40 @@ public class Ejercicios {
 
 		return resultado;
 	}
+	
+	/**************METODO PARA ACCEDER A FICHERO Y DEVOLVER ARRAY CON SU CONTENIDO*****************/
+	
+	public String[] metodoLerFichero(String lineaFicheroPartido) {	
+		String[] unaLineaRegistro = lineaFicheroPartido.split("#");	
+		
 
+		return unaLineaRegistro;		
+	}
+	
+	public void metodoLerFichero2(String rutaFichero) {
+		try {
+			BufferedReader fichero = new BufferedReader(new FileReader(rutaFichero));
+
+			String registro;
+
+			while ((registro = fichero.readLine()) != null) { // plantilla para la lectura de todos los ficheros de txts
+				String[] unaLineaRegistro = registro.split("#" /*","*/);
+				
+			}
+
+			fichero.close();
+			System.out.println("Lectura Exitosa. Fin de la lectura del fichero.");
+
+		} catch (FileNotFoundException e) {
+			System.out.println("FICHERO NO ENCONTRADO...");
+		} catch (IOException e) {
+			System.out.println("IO Exception");
+		}catch (NumberFormatException e) {
+			System.out.println("SALTO EXCEPCION: NumberFormatException... \n");
+		}
+
+	}
+	/************************************************/
 	public static void main(String[] args) {
 
 		Ejercicios ejercicios = new Ejercicios();
@@ -1499,52 +1625,52 @@ public class Ejercicios {
 		 HashMap<String, Equipo> mapaEquipos = ejercicios.obtencionMapaEquipos("ficheros/equipos.txt");
 		// System.out.println(mapaEquipos);
 		// ejercicios.mostrarNumeroPartidosJugados("ficheros/partidos.txt");
-		
+
 		// HashMap<String, ArrayList<Integer>> clasificacion = ejercicios.creaClasificacion("ficheros/partidos.txt", "ficheros/equipos.txt");
 		// System.out.println(clasificacion);
 		/******************************/
-		// HashMap<String, ArrayList<Integer>> resultadoEquipos = ejercicios.resultadoLigaEquipos("ficheros/partidos.txt");
-		//ejercicios.muestraPuntosEquipos(resultadoEquipos);		
-		// HashMap<String, Integer> nuevosPuntosEquipos = ejercicios.generaPuntosEquipos(resultadoEquipos);		
+		// HashMap<String, ArrayList<Integer>> resultadoEquipos =  ejercicios.resultadoLigaEquipos("ficheros/partidos.txt");
+		// ejercicios.muestraPuntosEquipos(resultadoEquipos);
+		// HashMap<String, Integer> nuevosPuntosEquipos = ejercicios.generaPuntosEquipos(resultadoEquipos);
 		// ejercicios.ordenarMapaPuntosEquipos(nuevosPuntosEquipos);
-		
+
 		// ArrayList<Equipo> ordenacionPorNombre = ejercicios.equiposListaOrdenadaNombre();
-		
-		HashMap<String, Equipo> nombreEquipos;
+
+		// HashMap<String, Equipo> nombreEquipos;
 		// HashMap<String, ArrayList<Integer>> totalGoles = ejercicios.sumarGolesEquipos("ficheros/partidos.txt");
 		// HashMap<String, ArrayList<Integer>> crearClasificacion = ejercicios.creaClasificacion("ficheros/partidos.txt", "ficheros/equipos.txt");
-		ArrayList<Equipo> crearClasificacionEquipo = ejercicios.creaClasificacionEquipo("ficheros/partidos.txt", mapaEquipos);
+		// ArrayList<Equipo> crearClasificacionEquipo = ejercicios.creaClasificacionEquipo("ficheros/partidos.txt", mapaEquipos);
+
+		/******************************/
+
+		// ejercicios.pruebaSWING();
+		Partido generaPartido = ejercicios.creaPartido("1#1#GIR#0#RVA#0");
+		// ejercicios.actualizaEquipos2(generaPartido, mapaEquipos);
 		
-		
-/******************************/		
-		
-		//ejercicios.pruebaSWING();
-		
-		
-		/******************************** metodos propios ***********************************************/
+		/********************************
+		 * metodos propios
+		 ***********************************************/
 
 		// HashMap<String, Integer> nuevoConteoPuntos = ejercicios.conteoPuntosPorEquipo("ficheros/partidos.txt");
 		// System.out.println(nuevoConteoPuntos);
-	
-		/* ArrayList<Partido> partidosJornada =
-		 ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 5);
-		 System.out.println("JORNADA: " + 5); 
-		 for (int i = 0; i < partidosJornada.size(); i++) { //System.out.println(partidosJornada.get(i));
-			System.out.println(partidosJornada.get(i).getIdPartido() +" - " +
-			partidosJornada.get(i).getJornada() +" - " +
-			partidosJornada.get(i).getNombreCortoEquipoLocal() +" - " +
-			partidosJornada.get(i).getGolesLocal() +" - " +
-			partidosJornada.get(i).getNombreCortoEquipoVisitante() +" - " +
-			partidosJornada.get(i).getGolesVisitantes()
-			); 
-		}*/
-		
+
+		/*
+		 * ArrayList<Partido> partidosJornada = ejercicios.devolverResultadoJornada("ficheros/partidos.txt", 5);
+		 * System.out.println("JORNADA: " + 5); for (int i = 0; i <
+		 * partidosJornada.size(); i++) { //System.out.println(partidosJornada.get(i));
+		 * System.out.println(partidosJornada.get(i).getIdPartido() +" - " +
+		 * partidosJornada.get(i).getJornada() +" - " +
+		 * partidosJornada.get(i).getNombreCortoEquipoLocal() +" - " +
+		 * partidosJornada.get(i).getGolesLocal() +" - " +
+		 * partidosJornada.get(i).getNombreCortoEquipoVisitante() +" - " +
+		 * partidosJornada.get(i).getGolesVisitantes() ); }
+		 */
 
 		/**************************************
 		 * fin metodos propios
 		 ***********************************************/
 
-		 System.exit(0);
+		System.exit(0);
 
 		int[] lista1 = { 2, 4, 8, 9 };
 		int[] lista2 = { 1, 3, 5, 23, 45, 67, 89, 123 };
