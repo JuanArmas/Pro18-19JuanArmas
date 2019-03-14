@@ -1,6 +1,8 @@
 package modelo;
 
-public class Equipo implements Comparable<Equipo> {
+import java.io.Serializable;
+
+public class Equipo implements Serializable, Comparable<Equipo> {
 	//puntos, victorias, empates, derrotas, golesFavor, golesContra.
 	
 	private Integer idEquipo;

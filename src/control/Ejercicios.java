@@ -1,9 +1,13 @@
 package control;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
 
@@ -26,6 +31,92 @@ import modelo.Partido;
 import modelo.Persona;
 
 public class Ejercicios {
+	//20 febrero 2019
+	// inicio practicas escribir ficheros
+	//-----------------------------------------
+	
+	// grabar cada registro
+	// 1ero buscar en java clases que diga object (io, string, output¿?)
+	// Serializable -> interfaz que sirve para ?¿
+	// a partir del fichero Equipos.txt crear un fichero binario.
+	// en la clase equipo habrá que implementar la clase serializable
+	// leer el objeto equipo y coger un tutorial para... ¿?
+	// el fichero de salida sera un objeto de clase equipo
+	// cada vez que lea el fichero txt crea un fichero equipo y se graba en el fichero salida.
+	// recorre equipos.txt creando objetos equipo y grabandolos en objetos
+	// cuando se lea siempre devuelve un object, se deberá castear.
+	// read object -> devuelve un object. se pondra un casting de equipo (Equipo)
+	// asi se podra trabajar con las propiedades del objeto
+	public void creaFicheroObjetosEquipo(String rutaEquipos){
+		FileOutputStream salida;
+		try {
+			salida = new FileOutputStream("ficheros/equipos.obj");
+			ObjectOutputStream objetos = new ObjectOutputStream(salida);
+			// ObjectOutputStream objetos = new ObjectOutputStream(new FileOutputStream("ficheros/equipos.obj"));
+			objetos.writeObject(salida);
+			
+			salida.close();
+			objetos.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Error Fichero no encontrado " + e.getMessage());	
+		} catch (IOException e) {
+			System.out.println("Error I/O " + e.getMessage());	
+		}
+	}
+	
+	// ejercicio grabar en un fichero el resultado de lanzar x veces un dado. 
+	// mirar metodo ya realizado generaListaAleatorios
+	// genera fichero entre 1-6
+	// grabarlo en fichero, añadir retorno de carro
+	// el fichero se llamaria tiradasDados.txt
+	// la logica seria con un contador, un for que vaya de 0 a cuantas -1
+	// redondeo siempre es con respecto a 5. 14,45 = 15.
+	// el truncar es cortar el decimal 14,45 = 14,4	
+	public void grabarTiraradasDados(int cuantas) {
+		
+		try {
+			BufferedWriter fichero = new BufferedWriter(new FileWriter("ficheros/tiradasDados.txt"));
+			Random rnd = new Random();
+			int acumulado = 0;
+			for(int i = 0; i < cuantas; i++) {
+				int numero = 1 + rnd.nextInt(6);
+				acumulado += numero; 
+				fichero.write(numero+"\n");
+			}
+			System.out.printf("media = %.2f \n", (float)acumulado/cuantas);
+			System.out.println("Proceso Terminado");
+			fichero.close();
+		} catch (IOException e) {
+			System.out.println("Error I/O " + e.getMessage());		
+		}
+		System.out.println("Fin entrada de datos...");
+	}
+	
+	public void entradaTecladoAFichero(String rutaFichero){
+		
+		try {
+			BufferedWriter fichero = new BufferedWriter(new FileWriter(rutaFichero));
+			// system.in es el teclado. system.out seria la consola
+			Scanner teclado = new Scanner(System.in);
+			//el teclado se bloqueará hasta que el usuario pulse enter. 
+			// el metodo devuelve un valor en forma de cadena, sera lo que el usuario habrá tecleado
+			String tecleado;
+			System.out.println("Teclee sus datos...  teclee x|X para terminar");
+			//mientras tecleado sea distinto a x o X seguir con el bucle
+			while((tecleado = teclado.nextLine()).compareToIgnoreCase("x")!=0) {
+			
+			//ahora se crearáun fichero de texto que será el de salida
+			fichero.write(tecleado + "\n"); // con el .write se introducirá el texto tecleado por el scanner¿?		
+			}
+			
+			fichero.close();
+		} catch (IOException e) {
+			System.out.println("Error I/O " + e.getMessage()); // el getMessage indicará el error			
+		}
+		System.out.println("Fin entrada de datos...");
+	}
+	// modo apertura append, only, etc..
+	
 	// 14 febrero 2019 
 	// verificar el metodo en el github de mauricio, esto es para 
 	public Equipo buscarEquipoEnLista(String nombreCorto, ArrayList<Equipo> equipos) {
@@ -74,8 +165,7 @@ public class Ejercicios {
 			// poner conteo de puntos
 			eL.setEmpates(eL.getEmpates() + 1);
 			eV.setGolesFavor(eV.getGolesFavor() + gV);
-			eV.setGolesContra( eV.getGolesContra() + gL);
-			
+			eV.setGolesContra( eV.getGolesContra() + gL);		
 		}
 	}
 	
@@ -1622,7 +1712,7 @@ public class Ejercicios {
 		// HashMap<String, Integer> numPartidosEquipo = ejercicios.comprobarPartidos("ficheros/partidos.txt");
 		// ArrayList<Equipo> listaEquipos = ejercicios.obtencionListaEquipos("ficheros/equipos.txt");
 		// System.out.println(listaEquipos);
-		 HashMap<String, Equipo> mapaEquipos = ejercicios.obtencionMapaEquipos("ficheros/equipos.txt");
+		// HashMap<String, Equipo> mapaEquipos = ejercicios.obtencionMapaEquipos("ficheros/equipos.txt");
 		// System.out.println(mapaEquipos);
 		// ejercicios.mostrarNumeroPartidosJugados("ficheros/partidos.txt");
 
@@ -1642,9 +1732,13 @@ public class Ejercicios {
 		// ArrayList<Equipo> crearClasificacionEquipo = ejercicios.creaClasificacionEquipo("ficheros/partidos.txt", mapaEquipos);
 
 		/******************************/
-
+		
+		 /********INICIO ESCRITURA FICHEROS**********************/	
+		 // ejercicios.entradaTecladoAFichero("ficheros/teclado.txt");
+		 ejercicios.grabarTiraradasDados(100);
+		 /******************************/
 		// ejercicios.pruebaSWING();
-		Partido generaPartido = ejercicios.creaPartido("1#1#GIR#0#RVA#0");
+		// Partido generaPartido = ejercicios.creaPartido("1#1#GIR#0#RVA#0");
 		// ejercicios.actualizaEquipos2(generaPartido, mapaEquipos);
 		
 		/********************************
